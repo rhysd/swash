@@ -1,6 +1,6 @@
 //! Vertical origin table.
 
-use super::{raw_tag, Bytes, RawTag};
+use super::{Bytes, RawTag, raw_tag};
 
 pub const VORG: RawTag = raw_tag(b"VORG");
 

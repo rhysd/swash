@@ -225,13 +225,13 @@ use hinting_cache::HintingCache;
 use image::*;
 use outline::*;
 use skrifa::{
+    GlyphId as SkrifaGlyphId, MetadataProvider,
     instance::{NormalizedCoord as SkrifaNormalizedCoord, Size as SkrifaSize},
     outline::OutlineGlyphCollection,
-    GlyphId as SkrifaGlyphId, MetadataProvider,
 };
 
 use super::internal;
-use super::{cache::FontCache, setting::Setting, FontRef, GlyphId, NormalizedCoord};
+use super::{FontRef, GlyphId, NormalizedCoord, cache::FontCache, setting::Setting};
 use alloc::vec::Vec;
 use core::borrow::Borrow;
 #[cfg(all(feature = "libm", feature = "render"))]
@@ -263,9 +263,10 @@ pub enum StrikeWith {
 }
 
 /// Glyph sources for the renderer.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub enum Source {
     /// Scalable outlines.
+    #[default]
     Outline,
     /// Layered color scalable outlines.
     ColorOutline(PaletteIndex),
@@ -273,12 +274,6 @@ pub enum Source {
     Bitmap(StrikeWith),
     /// Embedded color bitmaps.
     ColorBitmap(StrikeWith),
-}
-
-impl Default for Source {
-    fn default() -> Self {
-        Self::Outline
-    }
 }
 
 /// Context that manages caches and scratch buffers for scaling.
@@ -558,31 +553,28 @@ impl<'a> Scaler<'a> {
         color_index: Option<u16>,
         outline: Option<&mut Outline>,
     ) -> bool {
-        let mut outline = match outline {
+        let outline = match outline {
             Some(x) => x,
             _ => &mut self.state.outline,
         };
-        if let Some(outlines) = &self.outlines {
-            if let Some(glyph) = outlines.get(SkrifaGlyphId::from(glyph_id)) {
-                outline.begin_layer(color_index);
-                let settings: skrifa::outline::DrawSettings =
-                    if let Some(hinting_instance) = &self.hinting_instance {
-                        (*hinting_instance).into()
-                    } else {
-                        (
-                            self.skrifa_size,
-                            skrifa::instance::LocationRef::new(self.coords),
-                        )
-                            .into()
-                    };
-                if glyph
-                    .draw(settings, &mut OutlineWriter(&mut outline))
-                    .is_ok()
-                {
-                    outline.maybe_close();
-                    outline.finish();
-                    return true;
-                }
+        if let Some(outlines) = &self.outlines
+            && let Some(glyph) = outlines.get(SkrifaGlyphId::from(glyph_id))
+        {
+            outline.begin_layer(color_index);
+            let settings: skrifa::outline::DrawSettings =
+                if let Some(hinting_instance) = &self.hinting_instance {
+                    (*hinting_instance).into()
+                } else {
+                    (
+                        self.skrifa_size,
+                        skrifa::instance::LocationRef::new(self.coords),
+                    )
+                        .into()
+                };
+            if glyph.draw(settings, &mut OutlineWriter(outline)).is_ok() {
+                outline.maybe_close();
+                outline.finish();
+                return true;
             }
         }
         false

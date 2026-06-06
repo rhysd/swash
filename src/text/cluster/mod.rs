@@ -19,7 +19,7 @@ mod token;
 
 pub use self::{
     char::{Char, ShapeClass},
-    cluster::{CharCluster, SourceRange, Status, MAX_CLUSTER_SIZE},
+    cluster::{CharCluster, MAX_CLUSTER_SIZE, SourceRange, Status},
     info::{CharInfo, ClusterInfo, Emoji, Whitespace},
     parse::Parser,
     token::Token,

@@ -1,4 +1,4 @@
-use super::{tag_from_bytes, tag_from_str_lossy, Tag};
+use super::{Tag, tag_from_bytes, tag_from_str_lossy};
 use core::fmt;
 
 /// Setting combining a tag and a value for features and variations.

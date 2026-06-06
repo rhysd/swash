@@ -1,7 +1,7 @@
 //! Simple cluster formation (unicode grapheme cluster algorithm).
 
 use super::super::ClusterBreak;
-use super::{CharCluster, Emoji, ShapeClass, Token, Whitespace, MAX_CLUSTER_SIZE};
+use super::{CharCluster, Emoji, MAX_CLUSTER_SIZE, ShapeClass, Token, Whitespace};
 
 pub struct SimpleState<I> {
     chars: I,

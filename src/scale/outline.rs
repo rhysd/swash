@@ -218,10 +218,10 @@ impl<'a> LayerMut<'a> {
                 Verb::CurveTo => pos += 3,
             }
         }
-        if pos > point_start {
-            if let Some(points) = self.points.get_mut(point_start..pos) {
-                embolden(points, winding, x_strength, y_strength);
-            }
+        if pos > point_start
+            && let Some(points) = self.points.get_mut(point_start..pos)
+        {
+            embolden(points, winding, x_strength, y_strength);
         }
     }
 }
@@ -393,11 +393,7 @@ fn compute_winding(points: &[Point]) -> u8 {
         area += (cur.y - prev.y) * (cur.x + prev.x);
         prev = *cur;
     }
-    if area > 0. {
-        1
-    } else {
-        0
-    }
+    if area > 0. { 1 } else { 0 }
 }
 
 // The OutlineWriter wrapper allows us to make the trait implementation of OutlinePen

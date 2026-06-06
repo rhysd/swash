@@ -29,7 +29,7 @@ pub const fn raw_tag(bytes: &[u8; 4]) -> RawTag {
 /// Functions for checking the validity of a font file and extracting
 /// fonts from collections.
 pub mod raw_data {
-    use super::{raw_tag, Bytes, RawTag};
+    use super::{Bytes, RawTag, raw_tag};
 
     const OTTO: RawTag = raw_tag(b"OTTO");
     const TTCF: RawTag = raw_tag(b"ttcf");

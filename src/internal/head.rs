@@ -1,6 +1,6 @@
 //! Font header tables.
 
-use super::{raw_tag, Bytes, RawFont, RawTag};
+use super::{Bytes, RawFont, RawTag, raw_tag};
 
 pub const HEAD: RawTag = raw_tag(b"head");
 pub const OS_2: RawTag = raw_tag(b"OS/2");

@@ -1,6 +1,6 @@
-use super::cache::CacheKey;
-use super::internal::{raw_data, RawFont};
 use super::Tag;
+use super::cache::CacheKey;
+use super::internal::{RawFont, raw_data};
 
 /// Reference to the content of a font file.
 #[derive(Copy, Clone)]

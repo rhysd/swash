@@ -3,8 +3,8 @@ Glyph cluster modeling-- output from the shaper.
 */
 
 use super::buffer::MARK_ATTACH;
-use crate::text::cluster::{ClusterInfo, SourceRange, UserData};
 use crate::GlyphId;
+use crate::text::cluster::{ClusterInfo, SourceRange, UserData};
 
 /// Information for a glyph.
 #[derive(Copy, Clone, Default, Debug)]

@@ -1,6 +1,6 @@
 use super::unicode_data::{
-    compose_index, decompose_compat_index, decompose_index, COMPOSE0, COMPOSE1, COMPOSE1_COUNT,
-    DECOMPOSE, DECOMPOSE_COMPAT,
+    COMPOSE0, COMPOSE1, COMPOSE1_COUNT, DECOMPOSE, DECOMPOSE_COMPAT, compose_index,
+    decompose_compat_index, decompose_index,
 };
 use core::char::from_u32_unchecked;
 
@@ -114,7 +114,7 @@ fn compose_hangul(a: char, b: char) -> Option<char> {
         return None;
     }
     if a >= SBASE {
-        if (a - SBASE) % TCOUNT == 0 {
+        if (a - SBASE).is_multiple_of(TCOUNT) {
             Some(unsafe { from_u32_unchecked(a + (b - TBASE)) })
         } else {
             None

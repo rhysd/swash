@@ -1,8 +1,8 @@
 use super::cluster::{Glyph, GlyphInfo};
 use super::feature::*;
 use crate::text::{
-    cluster::{Char, CharCluster, ClusterInfo, ShapeClass, SourceRange, MAX_CLUSTER_SIZE},
     JoiningType,
+    cluster::{Char, CharCluster, ClusterInfo, MAX_CLUSTER_SIZE, ShapeClass, SourceRange},
 };
 
 use alloc::vec::Vec;
@@ -100,20 +100,20 @@ impl Buffer {
     pub fn push(&mut self, cluster: &CharCluster) -> Range<usize> {
         let start = self.glyphs.len();
         let chars = cluster.mapped_chars();
-        if cluster.info().is_broken() {
-            if let Some(id) = self.dotted_circle {
-                let first = &chars[0];
-                self.push_char(&Char {
-                    ch: '\u{25cc}',
-                    shape_class: ShapeClass::Base,
-                    joining_type: JoiningType::U,
-                    ignorable: false,
-                    contributes_to_shaping: true,
-                    glyph_id: id,
-                    offset: first.offset,
-                    data: first.data,
-                });
-            }
+        if cluster.info().is_broken()
+            && let Some(id) = self.dotted_circle
+        {
+            let first = &chars[0];
+            self.push_char(&Char {
+                ch: '\u{25cc}',
+                shape_class: ShapeClass::Base,
+                joining_type: JoiningType::U,
+                ignorable: false,
+                contributes_to_shaping: true,
+                glyph_id: id,
+                offset: first.offset,
+                data: first.data,
+            });
         }
         for ch in chars {
             self.push_char(ch);
@@ -126,20 +126,20 @@ impl Buffer {
     pub fn push_order(&mut self, cluster: &CharCluster, order: &[usize]) -> Range<usize> {
         let start = self.glyphs.len();
         let chars = cluster.mapped_chars();
-        if cluster.info().is_broken() {
-            if let Some(id) = self.dotted_circle {
-                let first = &chars[order[0]];
-                self.push_char(&Char {
-                    ch: '\u{25cc}',
-                    shape_class: ShapeClass::Base,
-                    joining_type: JoiningType::U,
-                    ignorable: false,
-                    contributes_to_shaping: true,
-                    glyph_id: id,
-                    offset: first.offset,
-                    data: first.data,
-                });
-            }
+        if cluster.info().is_broken()
+            && let Some(id) = self.dotted_circle
+        {
+            let first = &chars[order[0]];
+            self.push_char(&Char {
+                ch: '\u{25cc}',
+                shape_class: ShapeClass::Base,
+                joining_type: JoiningType::U,
+                ignorable: false,
+                contributes_to_shaping: true,
+                glyph_id: id,
+                offset: first.offset,
+                data: first.data,
+            });
         }
         for ch in order[..chars.len()].iter().map(|i| &chars[*i]) {
             self.push_char(ch);
@@ -152,20 +152,20 @@ impl Buffer {
     pub fn _push_hangul(&mut self, cluster: &CharCluster) -> Range<usize> {
         let start = self.glyphs.len();
         let chars = cluster.mapped_chars();
-        if cluster.info().is_broken() {
-            if let Some(id) = self.dotted_circle {
-                let first = &chars[0];
-                self.push_char(&Char {
-                    ch: '\u{25cc}',
-                    shape_class: ShapeClass::Base,
-                    joining_type: JoiningType::U,
-                    ignorable: false,
-                    contributes_to_shaping: true,
-                    glyph_id: id,
-                    offset: first.offset,
-                    data: first.data,
-                });
-            }
+        if cluster.info().is_broken()
+            && let Some(id) = self.dotted_circle
+        {
+            let first = &chars[0];
+            self.push_char(&Char {
+                ch: '\u{25cc}',
+                shape_class: ShapeClass::Base,
+                joining_type: JoiningType::U,
+                ignorable: false,
+                contributes_to_shaping: true,
+                glyph_id: id,
+                offset: first.offset,
+                data: first.data,
+            });
         }
         for ch in chars {
             self._push_hangul_char(ch);
@@ -400,10 +400,10 @@ impl Buffer {
                 continue;
             }
             let entry = JOIN_STATES[state][ty as usize];
-            if let Some(j) = prev {
-                if entry.0 != NONE_MASK {
-                    glyphs[j].mask = entry.0;
-                }
+            if let Some(j) = prev
+                && entry.0 != NONE_MASK
+            {
+                glyphs[j].mask = entry.0;
             }
             glyphs[i].mask = entry.1;
             prev = Some(i);
@@ -648,11 +648,11 @@ pub fn reorder_complex(glyphs: &mut [GlyphData], buf: &mut Vec<GlyphData>, order
         order[j] = i;
         j += 1;
         // Insert reph after final base
-        if Some(i) == last_base {
-            if let Some(i) = reph {
-                order[j] = i;
-                j += 1;
-            }
+        if Some(i) == last_base
+            && let Some(i) = reph
+        {
+            order[j] = i;
+            j += 1;
         }
         // Move vmpre, vpre and pref after the final virama
         if Some(i) == last_halant {

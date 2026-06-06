@@ -2,8 +2,8 @@
 
 use super::internal::*;
 use super::{
-    string::{LocalizedString, StringId},
     FontRef,
+    string::{LocalizedString, StringId},
 };
 
 const CPAL: RawTag = raw_tag(b"CPAL");

@@ -1,4 +1,4 @@
-use crate::{tag_from_bytes, Tag};
+use crate::{Tag, tag_from_bytes};
 use core::fmt;
 
 use super::lang_data::*;

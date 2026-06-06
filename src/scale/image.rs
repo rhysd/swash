@@ -7,20 +7,15 @@ use alloc::vec::Vec;
 use zeno::Placement;
 
 /// Content of a scaled glyph image.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub enum Content {
     /// 8-bit alpha mask.
+    #[default]
     Mask,
     /// 32-bit RGBA subpixel mask.
     SubpixelMask,
     /// 32-bit RGBA bitmap.
     Color,
-}
-
-impl Default for Content {
-    fn default() -> Self {
-        Self::Mask
-    }
 }
 
 /// Scaled glyph image.

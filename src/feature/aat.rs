@@ -1,8 +1,8 @@
 use super::internal::{aat::morx, raw_tag};
 use super::util::*;
 
-pub use morx::chains;
 use morx::Chains;
+pub use morx::chains;
 
 #[derive(Copy, Clone)]
 pub struct Features<'a> {
@@ -44,10 +44,9 @@ impl<'a> Iterator for Features<'a> {
                 if let Some(feature) = features.next() {
                     if let Some((index, tag, desc)) =
                         desc_from_aat(feature.selector, feature.setting_selector)
+                        && self.seen.mark(index)
                     {
-                        if self.seen.mark(index) {
-                            return Some((tag, desc));
-                        }
+                        return Some((tag, desc));
                     }
                 } else {
                     self.features = None;

@@ -1,7 +1,7 @@
 use super::{aat, at};
 
 use super::buffer::*;
-use super::internal::{self, at::Gdef, raw_tag, Bytes, RawFont, RawTag};
+use super::internal::{self, Bytes, RawFont, RawTag, at::Gdef, raw_tag};
 use crate::font::FontRef;
 use crate::text::{Language, Script};
 

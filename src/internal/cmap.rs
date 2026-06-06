@@ -1,6 +1,6 @@
 //! Character to glyph mapping table.
 
-use super::{raw_tag, Array, Bytes, RawFont, RawTag, Stream};
+use super::{Array, Bytes, RawFont, RawTag, Stream, raw_tag};
 
 pub const CMAP: RawTag = raw_tag(b"cmap");
 
@@ -152,11 +152,11 @@ pub fn enumerate(data: &[u8], subtable: u32, mut f: impl FnMut(u32, u16)) {
                     range_base += range as usize;
                     for codepoint in start..=end {
                         let diff = (codepoint - start) as usize * 2;
-                        if let Some(mut id) = b.read::<u16>(range_base + diff) {
-                            if id != 0 {
-                                id = (id as i32 + delta as i32) as u16;
-                                f(codepoint as u32, id);
-                            }
+                        if let Some(mut id) = b.read::<u16>(range_base + diff)
+                            && id != 0
+                        {
+                            id = (id as i32 + delta as i32) as u16;
+                            f(codepoint as u32, id);
                         }
                     }
                 }

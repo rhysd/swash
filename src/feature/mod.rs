@@ -2,7 +2,7 @@ mod aat;
 mod at;
 mod util;
 
-use super::internal::{self, raw_tag, Bytes, RawFont};
+use super::internal::{self, Bytes, RawFont, raw_tag};
 use super::{FontRef, Tag};
 use crate::text::{Language, Script};
 

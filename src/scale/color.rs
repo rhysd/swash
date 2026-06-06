@@ -1,8 +1,8 @@
 use super::super::{
-    palette::{ColorPalette, ColorPalettes},
     FontRef, GlyphId,
+    palette::{ColorPalette, ColorPalettes},
 };
-use super::internal::{raw_tag, Bytes, RawFont, RawTag};
+use super::internal::{Bytes, RawFont, RawTag, raw_tag};
 
 const COLR: RawTag = raw_tag(b"COLR");
 const CPAL: RawTag = raw_tag(b"CPAL");

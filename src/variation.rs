@@ -1,8 +1,8 @@
-use super::internal::{var::*, RawFont};
+use super::internal::{RawFont, var::*};
 use super::{
+    FontRef, NormalizedCoord, Tag,
     setting::Setting,
     string::{LocalizedString, StringId},
-    FontRef, NormalizedCoord, Tag,
 };
 
 /// Proxy for rematerializing variations collections.
@@ -81,10 +81,10 @@ impl<'a> Variations<'a> {
     /// for the current state of the iterator.
     pub fn find_by_tag(&self, tag: Tag) -> Option<Variation<'a>> {
         for i in 0..self.len {
-            if let Some(var) = self.get(i) {
-                if var.tag() == tag {
-                    return Some(var);
-                }
+            if let Some(var) = self.get(i)
+                && var.tag() == tag
+            {
+                return Some(var);
             }
         }
         None
@@ -237,12 +237,12 @@ impl<'a> Instances<'a> {
     pub fn find_by_postscript_name(&self, name: &str) -> Option<Instance<'a>> {
         let strings = self.font.localized_strings();
         for i in 0..self.len {
-            if let Some(instance) = self.get(i) {
-                if let Some(id) = instance.postscript_name_id() {
-                    for instance_name in strings.filter(|s| s.id() == id) {
-                        if instance_name.chars().eq(name.chars()) {
-                            return Some(instance);
-                        }
+            if let Some(instance) = self.get(i)
+                && let Some(id) = instance.postscript_name_id()
+            {
+                for instance_name in strings.filter(|s| s.id() == id) {
+                    if instance_name.chars().eq(name.chars()) {
+                        return Some(instance);
                     }
                 }
             }

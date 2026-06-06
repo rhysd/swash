@@ -5,14 +5,14 @@ Unicode character properties.
 pub use super::compose::Decompose;
 #[doc(inline)]
 pub use super::unicode_data::{
-    BidiClass, Block, Category, ClusterBreak, JoiningType, LineBreak, Script, WordBreak,
-    UNICODE_VERSION,
+    BidiClass, Block, Category, ClusterBreak, JoiningType, LineBreak, Script, UNICODE_VERSION,
+    WordBreak,
 };
 
 use super::compose::{compose_pair, decompose, decompose_compat};
 use super::unicode_data::{
-    get_record_index, MyanmarClass, Record, UseClass, BRACKETS, MIRRORS, RECORDS, SCRIPTS_BY_TAG,
-    SCRIPT_COMPLEXITY, SCRIPT_NAMES, SCRIPT_TAGS,
+    BRACKETS, MIRRORS, MyanmarClass, RECORDS, Record, SCRIPT_COMPLEXITY, SCRIPT_NAMES, SCRIPT_TAGS,
+    SCRIPTS_BY_TAG, UseClass, get_record_index,
 };
 use crate::Tag;
 

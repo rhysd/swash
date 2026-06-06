@@ -101,7 +101,7 @@ impl<'a> Bytes<'a> {
     /// checking.
     #[inline(always)]
     pub unsafe fn read_unchecked<T: FromBeData>(&self, offset: usize) -> T {
-        T::from_be_data_unchecked(self.0, offset)
+        unsafe { T::from_be_data_unchecked(self.0, offset) }
     }
 
     /// Reads an array of values of the specified type and length at some
@@ -333,7 +333,7 @@ impl<'a, T: FromBeData> Array<'a, T> {
 
     /// Returns the element at the specified index without bounds checking.
     pub unsafe fn get_unchecked(&self, index: usize) -> T {
-        T::from_be_data_unchecked(self.data, index * T::SIZE)
+        unsafe { T::from_be_data_unchecked(self.data, index * T::SIZE) }
     }
 
     /// Performs a binary search over the array using the specified comparator
@@ -435,71 +435,77 @@ pub(crate) const USE_UNALIGNED_READS_LE: bool =
 
 impl FromBeData for u8 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        *buf.get_unchecked(offset)
+        unsafe { *buf.get_unchecked(offset) }
     }
 }
 
 impl FromBeData for i8 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        *buf.get_unchecked(offset) as i8
+        unsafe { *buf.get_unchecked(offset) as i8 }
     }
 }
 
 impl FromBeData for u16 {
     #[inline(always)]
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        if USE_UNALIGNED_READS_LE {
-            (buf.as_ptr().add(offset) as *const u16)
-                .read_unaligned()
-                .swap_bytes()
-        } else {
-            (*buf.get_unchecked(offset) as u16) << 8 | *buf.get_unchecked(offset + 1) as u16
+        unsafe {
+            if USE_UNALIGNED_READS_LE {
+                (buf.as_ptr().add(offset) as *const u16)
+                    .read_unaligned()
+                    .swap_bytes()
+            } else {
+                (*buf.get_unchecked(offset) as u16) << 8 | *buf.get_unchecked(offset + 1) as u16
+            }
         }
     }
 }
 
 impl FromBeData for i16 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        u16::from_be_data_unchecked(buf, offset) as i16
+        unsafe { u16::from_be_data_unchecked(buf, offset) as i16 }
     }
 }
 
 impl FromBeData for u32 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        if USE_UNALIGNED_READS_LE {
-            (buf.as_ptr().add(offset) as *const u32)
-                .read_unaligned()
-                .swap_bytes()
-        } else {
-            (*buf.get_unchecked(offset) as u32) << 24
-                | (*buf.get_unchecked(offset + 1) as u32) << 16
-                | (*buf.get_unchecked(offset + 2) as u32) << 8
-                | *buf.get_unchecked(offset + 3) as u32
+        unsafe {
+            if USE_UNALIGNED_READS_LE {
+                (buf.as_ptr().add(offset) as *const u32)
+                    .read_unaligned()
+                    .swap_bytes()
+            } else {
+                (*buf.get_unchecked(offset) as u32) << 24
+                    | (*buf.get_unchecked(offset + 1) as u32) << 16
+                    | (*buf.get_unchecked(offset + 2) as u32) << 8
+                    | *buf.get_unchecked(offset + 3) as u32
+            }
         }
     }
 }
 
 impl FromBeData for i32 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        u32::from_be_data_unchecked(buf, offset) as i32
+        unsafe { u32::from_be_data_unchecked(buf, offset) as i32 }
     }
 }
 
 impl FromBeData for u64 {
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        if USE_UNALIGNED_READS_LE {
-            (buf.as_ptr().add(offset) as *const u64)
-                .read_unaligned()
-                .swap_bytes()
-        } else {
-            (*buf.get_unchecked(offset) as u64) << 56
-                | (*buf.get_unchecked(offset + 1) as u64) << 48
-                | (*buf.get_unchecked(offset + 2) as u64) << 40
-                | (*buf.get_unchecked(offset + 3) as u64) << 32
-                | (*buf.get_unchecked(offset + 4) as u64) << 24
-                | (*buf.get_unchecked(offset + 5) as u64) << 16
-                | (*buf.get_unchecked(offset + 6) as u64) << 8
-                | *buf.get_unchecked(offset + 7) as u64
+        unsafe {
+            if USE_UNALIGNED_READS_LE {
+                (buf.as_ptr().add(offset) as *const u64)
+                    .read_unaligned()
+                    .swap_bytes()
+            } else {
+                (*buf.get_unchecked(offset) as u64) << 56
+                    | (*buf.get_unchecked(offset + 1) as u64) << 48
+                    | (*buf.get_unchecked(offset + 2) as u64) << 40
+                    | (*buf.get_unchecked(offset + 3) as u64) << 32
+                    | (*buf.get_unchecked(offset + 4) as u64) << 24
+                    | (*buf.get_unchecked(offset + 5) as u64) << 16
+                    | (*buf.get_unchecked(offset + 6) as u64) << 8
+                    | *buf.get_unchecked(offset + 7) as u64
+            }
         }
     }
 }
@@ -513,11 +519,13 @@ impl FromBeData for U24 {
     const SIZE: usize = 3;
 
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        Self(
-            (*buf.get_unchecked(offset) as u32) << 16
-                | (*buf.get_unchecked(offset + 1) as u32) << 8
-                | *buf.get_unchecked(offset + 2) as u32,
-        )
+        unsafe {
+            Self(
+                (*buf.get_unchecked(offset) as u32) << 16
+                    | (*buf.get_unchecked(offset + 1) as u32) << 8
+                    | *buf.get_unchecked(offset + 2) as u32,
+            )
+        }
     }
 }
 

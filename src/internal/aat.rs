@@ -1,6 +1,6 @@
 //! Apple advanced typography tables.
 
-use super::{raw_tag, Array, Bytes, FromBeData, RawTag};
+use super::{Array, Bytes, FromBeData, RawTag, raw_tag};
 
 pub const MORX: RawTag = raw_tag(b"morx");
 pub const LTAG: RawTag = raw_tag(b"ltag");
@@ -225,13 +225,15 @@ impl<T: FromBeData> FromBeData for Entry<T> {
     const SIZE: usize = 4 + T::SIZE;
 
     unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-        let new_state = u16::from_be_data_unchecked(buf, offset);
-        let flags = u16::from_be_data_unchecked(buf, offset + 2);
-        let data = T::from_be_data_unchecked(buf, offset + 4);
-        Self {
-            new_state,
-            flags,
-            data,
+        unsafe {
+            let new_state = u16::from_be_data_unchecked(buf, offset);
+            let flags = u16::from_be_data_unchecked(buf, offset + 2);
+            let data = T::from_be_data_unchecked(buf, offset + 4);
+            Self {
+                new_state,
+                flags,
+                data,
+            }
         }
     }
 }
@@ -669,20 +671,20 @@ pub mod morx {
                     .state_table
                     .entry::<ContextualData>(state.state, class)?;
                 state.state = entry.new_state;
-                if entry.data.mark_index != 0xFFFF {
-                    if let Some(g) = self.lookup(entry.data.mark_index, state.mark_id) {
-                        f(state.mark_index, g)?;
-                        if state.mark_index == index {
-                            last_glyph_id = g;
-                            current_glyph_id = g;
-                        }
-                    }
-                }
-                if entry.data.current_index != 0xFFFF {
-                    if let Some(g) = self.lookup(entry.data.current_index, last_glyph_id) {
-                        f(index, g)?;
+                if entry.data.mark_index != 0xFFFF
+                    && let Some(g) = self.lookup(entry.data.mark_index, state.mark_id)
+                {
+                    f(state.mark_index, g)?;
+                    if state.mark_index == index {
+                        last_glyph_id = g;
                         current_glyph_id = g;
                     }
+                }
+                if entry.data.current_index != 0xFFFF
+                    && let Some(g) = self.lookup(entry.data.current_index, last_glyph_id)
+                {
+                    f(index, g)?;
+                    current_glyph_id = g;
                 }
                 if entry.flags & SET_MARK != 0 {
                     state.mark_set = true;
@@ -733,11 +735,13 @@ pub mod morx {
 
     impl FromBeData for ContextualData {
         unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-            let mark_index = u16::from_be_data_unchecked(buf, offset);
-            let current_index = u16::from_be_data_unchecked(buf, offset + 2);
-            Self {
-                mark_index,
-                current_index,
+            unsafe {
+                let mark_index = u16::from_be_data_unchecked(buf, offset);
+                let current_index = u16::from_be_data_unchecked(buf, offset + 2);
+                Self {
+                    mark_index,
+                    current_index,
+                }
             }
         }
     }
@@ -1001,11 +1005,13 @@ pub mod morx {
 
     impl FromBeData for InsertionData {
         unsafe fn from_be_data_unchecked(buf: &[u8], offset: usize) -> Self {
-            let current_index = u16::from_be_data_unchecked(buf, offset);
-            let mark_index = u16::from_be_data_unchecked(buf, offset + 2);
-            Self {
-                current_index,
-                mark_index,
+            unsafe {
+                let current_index = u16::from_be_data_unchecked(buf, offset);
+                let mark_index = u16::from_be_data_unchecked(buf, offset + 2);
+                Self {
+                    current_index,
+                    mark_index,
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 //! OpenType advanced typography tables.
 
-use super::{raw_tag, Bytes, RawTag};
+use super::{Bytes, RawTag, raw_tag};
 
 pub const GDEF: RawTag = raw_tag(b"GDEF");
 pub const GSUB: RawTag = raw_tag(b"GSUB");
@@ -62,7 +62,7 @@ impl<'a> Gdef<'a> {
     }
 
     pub fn ok(&self) -> bool {
-        self.data.len() != 0
+        !self.data.is_empty()
     }
 
     /// Returns true if glyph classes are available.
@@ -556,17 +556,15 @@ pub fn lookup_data(
     let ignore_marks = f & (1 << 3) != 0;
     let mut mark_check = 0;
     let mut mark_set = 0;
-    if !ignore_marks {
-        if let Some(gdef) = gdef {
-            mark_check = (mark_class != 0 && gdef.has_mark_classes()) as u8;
-            mark_set = if gdef.ok() && flag & 0x10 != 0 {
-                let idx = b.read::<u16>(base + 6 + count as usize * 2)?;
-                mark_check = 1;
-                gdef.mark_set_offset(idx).unwrap_or(0)
-            } else {
-                0
-            };
-        }
+    if !ignore_marks && let Some(gdef) = gdef {
+        mark_check = (mark_class != 0 && gdef.has_mark_classes()) as u8;
+        mark_set = if gdef.ok() && flag & 0x10 != 0 {
+            let idx = b.read::<u16>(base + 6 + count as usize * 2)?;
+            mark_check = 1;
+            gdef.mark_set_offset(idx).unwrap_or(0)
+        } else {
+            0
+        };
     }
     let is_sub = stage == 0;
     let subtables = base + 6;
@@ -834,41 +832,43 @@ fn validate_coverage(b: &Bytes, coverage_offset: u32) -> bool {
 }
 
 pub unsafe fn fast_coverage(b: &Bytes, coverage_offset: u32, glyph_id: u16) -> Option<u16> {
-    let base = coverage_offset as usize;
-    let fmt = b.read_unchecked::<u16>(base);
-    let len = b.read_unchecked::<u16>(base + 2) as usize;
-    let arr = base + 4;
-    if fmt == 1 {
-        let mut l = 0;
-        let mut h = len;
-        while l < h {
-            use core::cmp::Ordering::*;
-            let i = (l + h) / 2;
-            let g = b.read_unchecked::<u16>(arr + i * 2);
-            match glyph_id.cmp(&g) {
-                Less => h = i,
-                Greater => l = i + 1,
-                Equal => return Some(i as u16),
+    unsafe {
+        let base = coverage_offset as usize;
+        let fmt = b.read_unchecked::<u16>(base);
+        let len = b.read_unchecked::<u16>(base + 2) as usize;
+        let arr = base + 4;
+        if fmt == 1 {
+            let mut l = 0;
+            let mut h = len;
+            while l < h {
+                use core::cmp::Ordering::*;
+                let i = (l + h) / 2;
+                let g = b.read_unchecked::<u16>(arr + i * 2);
+                match glyph_id.cmp(&g) {
+                    Less => h = i,
+                    Greater => l = i + 1,
+                    Equal => return Some(i as u16),
+                }
+            }
+        } else if fmt == 2 {
+            let mut l = 0;
+            let mut h = len;
+            while l < h {
+                let i = (l + h) / 2;
+                let rec = arr + i * 6;
+                let start = b.read_unchecked::<u16>(rec);
+                if glyph_id < start {
+                    h = i;
+                } else if glyph_id > b.read_unchecked::<u16>(rec + 2) {
+                    l = i + 1;
+                } else {
+                    let base = b.read_unchecked::<u16>(rec + 4);
+                    return Some(base + glyph_id - start);
+                }
             }
         }
-    } else if fmt == 2 {
-        let mut l = 0;
-        let mut h = len;
-        while l < h {
-            let i = (l + h) / 2;
-            let rec = arr + i * 6;
-            let start = b.read_unchecked::<u16>(rec);
-            if glyph_id < start {
-                h = i;
-            } else if glyph_id > b.read_unchecked::<u16>(rec + 2) {
-                l = i + 1;
-            } else {
-                let base = b.read_unchecked::<u16>(rec + 4);
-                return Some(base + glyph_id - start);
-            }
-        }
+        None
     }
-    None
 }
 
 pub fn coverage(b: &Bytes, coverage_offset: u32, glyph_id: u16) -> Option<u16> {

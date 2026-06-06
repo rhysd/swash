@@ -1,7 +1,7 @@
 //! Parser for Myanmar clusters.
 
 use super::unicode_data::{Category, ClusterBreak, MyanmarClass};
-use super::{CharCluster, Emoji, ShapeClass, Token, Whitespace, MAX_CLUSTER_SIZE};
+use super::{CharCluster, Emoji, MAX_CLUSTER_SIZE, ShapeClass, Token, Whitespace};
 
 type Kind = MyanmarClass;
 
@@ -118,19 +118,17 @@ where
                 match self.s.cur.ch as u32 {
                     0x1004 | 0x101B | 0x105A => {
                         let mut iter = self.s.chars.clone();
-                        if let Some(b) = iter.next() {
-                            if b.ch == '\u{103A}' {
-                                if let Some(c) = iter.next() {
-                                    if c.ch == '\u{1039}' {
-                                        self.cluster.push(&self.s.cur, ShapeClass::Kinzi);
-                                        self.cluster.push(&b, ShapeClass::Kinzi);
-                                        self.cluster.push(&c, ShapeClass::Kinzi);
-                                        self.advance();
-                                        self.advance();
-                                        self.advance();
-                                    }
-                                }
-                            }
+                        if let Some(b) = iter.next()
+                            && b.ch == '\u{103A}'
+                            && let Some(c) = iter.next()
+                            && c.ch == '\u{1039}'
+                        {
+                            self.cluster.push(&self.s.cur, ShapeClass::Kinzi);
+                            self.cluster.push(&b, ShapeClass::Kinzi);
+                            self.cluster.push(&c, ShapeClass::Kinzi);
+                            self.advance();
+                            self.advance();
+                            self.advance();
                         }
                     }
                     _ => {}

@@ -1,5 +1,5 @@
 use super::internal::{at::*, *};
-use super::{buffer::*, feature::*, Direction};
+use super::{Direction, buffer::*, feature::*};
 use crate::text::Script;
 
 use alloc::vec::Vec;
@@ -387,13 +387,13 @@ impl FeatureStoreBuilder {
         cache.clear();
         if gsub.base != 0 {
             self.build_stage(cache, &b, coords, gdef, gsub, 0);
-            cache.sub_features.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+            cache.sub_features.sort_unstable_by_key(|a| a.0);
         }
         cache.sub_count = cache.sub_features.len();
         cache.pos_start = cache.lookups.len();
         if gpos.base != 0 {
             self.build_stage(cache, &b, coords, gdef, gpos, 1);
-            cache.pos_features.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+            cache.pos_features.sort_unstable_by_key(|a| a.0);
         }
     }
 
@@ -465,7 +465,7 @@ impl FeatureStoreBuilder {
                 self.indices.push((lookup_index, fbit, mask));
             }
         }
-        self.indices.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+        self.indices.sort_unstable_by_key(|a| a.0);
         //self.indices.dedup_by(|a, b| a.0 == b.0);
         let mut last_index = None;
         for (index, feature, mask) in &self.indices {
@@ -570,7 +570,7 @@ impl CoverageBuilder {
         coverage.push(self.max);
         let bit_base = coverage.len();
         let range_len = (self.max - self.min) as usize + 1;
-        coverage.resize(coverage.len() + (range_len + 15) / 16, 0);
+        coverage.resize(coverage.len() + range_len.div_ceil(16), 0);
         for g in &self.coverage.list {
             let bit = g - self.min;
             let idx = bit_base + bit as usize / 16;
@@ -1004,11 +1004,11 @@ impl<'a, 'b, 'c> ApplyContext<'a, 'b, 'c> {
                     let id = g.id;
                     if self.cache.test(lookup.coverage, id) {
                         for s in subtables {
-                            if let Some(index) = s.coverage(b, id) {
-                                if self.apply_subtable(b, s, index as usize, i, id) == Some(true) {
-                                    applied = true;
-                                    break;
-                                }
+                            if let Some(index) = s.coverage(b, id)
+                                && self.apply_subtable(b, s, index as usize, i, id) == Some(true)
+                            {
+                                applied = true;
+                                break;
                             }
                         }
                     }
@@ -1029,11 +1029,11 @@ impl<'a, 'b, 'c> ApplyContext<'a, 'b, 'c> {
                     let id = g.id;
                     if self.cache.test(lookup.coverage, id) {
                         for s in subtables {
-                            if let Some(index) = s.coverage(b, id) {
-                                if self.apply_subtable(b, s, index as usize, i, id) == Some(true) {
-                                    applied = true;
-                                    break;
-                                }
+                            if let Some(index) = s.coverage(b, id)
+                                && self.apply_subtable(b, s, index as usize, i, id) == Some(true)
+                            {
+                                applied = true;
+                                break;
                             }
                         }
                     }
@@ -1677,13 +1677,12 @@ impl<'a, 'b, 'c> ApplyContext<'a, 'b, 'c> {
                 subtable = subtable + b.read::<u32>(subtable + 4)? as usize;
             }
             let fmt = b.read::<u16>(subtable)?;
-            if let Some(ref s) = subtable_data(b, subtable as u32, kind, fmt) {
-                if let Some(index) = s.coverage(b, g) {
-                    if let Some(true) = self.apply_subtable(b, s, index as usize, cur, g) {
-                        applied = true;
-                        break;
-                    }
-                }
+            if let Some(ref s) = subtable_data(b, subtable as u32, kind, fmt)
+                && let Some(index) = s.coverage(b, g)
+                && let Some(true) = self.apply_subtable(b, s, index as usize, cur, g)
+            {
+                applied = true;
+                break;
             }
         }
         //     if reverse {

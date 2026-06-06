@@ -257,12 +257,12 @@ mod feature;
 use cluster::*;
 
 use super::{
-    cache::FontCache, charmap::Charmap, internal, metrics::Metrics, setting::Setting, FontRef,
-    NormalizedCoord,
+    FontRef, NormalizedCoord, cache::FontCache, charmap::Charmap, internal, metrics::Metrics,
+    setting::Setting,
 };
 use crate::text::{
-    cluster::{CharCluster, Parser, ShapeClass, Token},
     Language, Script,
+    cluster::{CharCluster, Parser, ShapeClass, Token},
 };
 use alloc::vec::Vec;
 use at::{FeatureMask, FeatureStore, FeatureStoreBuilder};
@@ -850,10 +850,8 @@ impl<'a> Shaper<'a> {
             PosMode::Kerx => {
                 e.kerx(buf, self.state.disable_kern);
             }
-            PosMode::Kern => {
-                if !self.state.disable_kern {
-                    e.kern(buf);
-                }
+            PosMode::Kern if !self.state.disable_kern => {
+                e.kern(buf);
             }
             _ => {}
         }

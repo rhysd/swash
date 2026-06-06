@@ -1,6 +1,6 @@
 //! Feature constants.
 
-use super::internal::{raw_tag, RawTag};
+use super::internal::{RawTag, raw_tag};
 
 // Default tag used in various places.
 pub const _DFLT: RawTag = raw_tag(b"DFLT");

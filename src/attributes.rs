@@ -1,7 +1,7 @@
 //! Basic font attributes: stretch, weight and style.
 
-use super::internal::{head::Os2, RawFont};
-use super::{tag_from_bytes, FontRef, Setting, Tag};
+use super::internal::{RawFont, head::Os2};
+use super::{FontRef, Setting, Tag, tag_from_bytes};
 
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -327,8 +327,9 @@ impl Default for ObliqueAngle {
 }
 
 /// Visual style or 'slope' of a font.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub enum Style {
+    #[default]
     Normal,
     Italic,
     Oblique(ObliqueAngle),
@@ -425,12 +426,6 @@ impl fmt::Display for Style {
                 }
             }
         )
-    }
-}
-
-impl Default for Style {
-    fn default() -> Self {
-        Self::Normal
     }
 }
 

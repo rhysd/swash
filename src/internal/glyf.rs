@@ -1,6 +1,6 @@
 //! Glyph data table.
 
-use super::{raw_tag, Bytes, RawTag, Stream};
+use super::{Bytes, RawTag, Stream, raw_tag};
 
 pub const GLYF: RawTag = raw_tag(b"glyf");
 pub const LOCA: RawTag = raw_tag(b"loca");

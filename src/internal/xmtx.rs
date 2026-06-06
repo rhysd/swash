@@ -1,6 +1,6 @@
 //! Glyph metrics tables.
 
-use super::{raw_tag, Bytes, RawTag};
+use super::{Bytes, RawTag, raw_tag};
 
 pub const HMTX: RawTag = raw_tag(b"hmtx");
 pub const VMTX: RawTag = raw_tag(b"vmtx");

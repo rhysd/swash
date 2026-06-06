@@ -1,4 +1,4 @@
-use super::internal::{raw_tag, RawTag};
+use super::internal::{RawTag, raw_tag};
 
 #[derive(Copy, Clone)]
 pub struct SeenFeatures {

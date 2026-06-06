@@ -1,6 +1,6 @@
 //! Font and metric variation tables.
 
-use super::{fixed::Fixed, raw_tag, Array, Bytes, RawFont, RawTag, U24};
+use super::{Array, Bytes, RawFont, RawTag, U24, fixed::Fixed, raw_tag};
 
 pub const FVAR: RawTag = raw_tag(b"fvar");
 pub const AVAR: RawTag = raw_tag(b"avar");
@@ -233,7 +233,7 @@ pub fn sb_delta(data: &[u8], xvar: u32, glyph_id: u16, coords: &[i16]) -> f32 {
 /// Applies adjustments to a coordinate according to the optional axis
 /// variation table.
 pub fn adjust_axis(data: &[u8], avar: u32, axis: u16, coord: Fixed) -> Option<Fixed> {
-    use skrifa::raw::{tables::avar::Avar, types::Fixed, FontData, FontRead};
+    use skrifa::raw::{FontData, FontRead, tables::avar::Avar, types::Fixed};
 
     if avar == 0 {
         return None;
@@ -375,7 +375,7 @@ fn metric_delta(
 
 /// Tags for metrics from the `MVAR` table.
 pub mod mvar_tags {
-    use super::{raw_tag, RawTag};
+    use super::{RawTag, raw_tag};
 
     /// Horizontal ascender.
     pub const HASC: RawTag = raw_tag(b"hasc");

@@ -130,7 +130,7 @@ impl From<Fixed> for f32 {
 
 impl FromBeData for Fixed {
     unsafe fn from_be_data_unchecked(data: &[u8], offset: usize) -> Self {
-        Self(i32::from_be_data_unchecked(data, offset))
+        unsafe { Self(i32::from_be_data_unchecked(data, offset)) }
     }
 }
 
@@ -172,11 +172,7 @@ pub fn div(mut a: i32, mut b: i32) -> i32 {
     } else {
         ((((a as u64) << 16) + ((b as u64) >> 1)) / (b as u64)) as u32
     };
-    if s < 0 {
-        -(q as i32)
-    } else {
-        q as i32
-    }
+    if s < 0 { -(q as i32) } else { q as i32 }
 }
 
 /// Fixed point multiply/divide.
@@ -199,9 +195,5 @@ pub fn muldiv(mut a: i32, mut b: i32, mut c: i32) -> i32 {
     } else {
         0x7FFFFFFF
     };
-    if s < 0 {
-        -(d as i32)
-    } else {
-        d as i32
-    }
+    if s < 0 { -(d as i32) } else { d as i32 }
 }

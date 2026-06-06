@@ -1,4 +1,4 @@
-use super::{cluster::Boundary, Codepoint, LineBreak, Properties, WordBreak};
+use super::{Codepoint, LineBreak, Properties, WordBreak, cluster::Boundary};
 use core::borrow::Borrow;
 
 /// Returns an iterator yielding unicode properties and boundary analysis for
@@ -166,12 +166,11 @@ impl BoundaryState {
                     .clone()
                     .next()
                     .map(|p| p.borrow().properties().word_break())
+                    && c.mask() & AH_LETTER != 0
                 {
-                    if c.mask() & AH_LETTER != 0 {
-                        self.prevent_next = true;
-                        self.reset_state();
-                        return false;
-                    }
+                    self.prevent_next = true;
+                    self.reset_state();
+                    return false;
                 }
             }
         }
@@ -187,12 +186,11 @@ impl BoundaryState {
                     .clone()
                     .next()
                     .map(|p| p.borrow().properties().word_break())
+                    && c == HL
                 {
-                    if c == HL {
-                        self.prevent_next = true;
-                        self.reset_state();
-                        return false;
-                    }
+                    self.prevent_next = true;
+                    self.reset_state();
+                    return false;
                 }
             }
         }
@@ -203,19 +201,18 @@ impl BoundaryState {
                 self.reset_state();
                 return false;
             }
-            if b_mask & (MN.mask() | MID_NUM_LET_Q) != 0 {
-                if let Some(c) = iter
+            if b_mask & (MN.mask() | MID_NUM_LET_Q) != 0
+                && let Some(c) = iter
                     .clone()
                     .next()
                     .map(|p| p.borrow().properties().word_break())
-                {
-                    // Numeric (MidNum | MidNumLetQ) × Numeric
-                    // Numeric × (MidNum | MidNumLetQ) Numeric
-                    if c == NU {
-                        self.prevent_next = true;
-                        self.reset_state();
-                        return false;
-                    }
+            {
+                // Numeric (MidNum | MidNumLetQ) × Numeric
+                // Numeric × (MidNum | MidNumLetQ) Numeric
+                if c == NU {
+                    self.prevent_next = true;
+                    self.reset_state();
+                    return false;
                 }
             }
         }

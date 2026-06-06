@@ -4,8 +4,8 @@ Localized names and other metadata.
 
 use core::fmt::Write;
 
-use super::internal::*;
 use super::FontRef;
+use super::internal::*;
 
 const NAME: RawTag = raw_tag(b"name");
 

@@ -68,23 +68,24 @@ impl MetricsProxy {
             strikeout_offset: self.strikeout_offset as f32,
             stroke_size: self.stroke_size as f32,
         };
-        if self.mvar != 0 && !coords.is_empty() {
-            if let Some(v) = var::Mvar::new(data, self.mvar, coords) {
-                use var::mvar_tags::*;
-                m.ascent += v.delta(HASC);
-                m.descent += v.delta(HDSC);
-                m.leading += v.delta(HLGP);
-                if self.has_vertical_metrics {
-                    m.vertical_ascent += v.delta(VASC);
-                    m.vertical_descent += v.delta(VDSC);
-                    m.vertical_leading += v.delta(VLGP);
-                }
-                m.cap_height += v.delta(CPHT);
-                m.x_height += v.delta(XHGT);
-                m.underline_offset += v.delta(UNDO);
-                m.strikeout_offset += v.delta(STRO);
-                m.stroke_size += v.delta(UNDS);
+        if self.mvar != 0
+            && !coords.is_empty()
+            && let Some(v) = var::Mvar::new(data, self.mvar, coords)
+        {
+            use var::mvar_tags::*;
+            m.ascent += v.delta(HASC);
+            m.descent += v.delta(HDSC);
+            m.leading += v.delta(HLGP);
+            if self.has_vertical_metrics {
+                m.vertical_ascent += v.delta(VASC);
+                m.vertical_descent += v.delta(VDSC);
+                m.vertical_leading += v.delta(VLGP);
             }
+            m.cap_height += v.delta(CPHT);
+            m.x_height += v.delta(XHGT);
+            m.underline_offset += v.delta(UNDO);
+            m.strikeout_offset += v.delta(STRO);
+            m.stroke_size += v.delta(UNDS);
         }
         m
     }
@@ -99,23 +100,20 @@ impl MetricsProxy {
     ) -> GlyphMetrics<'a> {
         let data = font.data;
         let mut vertical = self.vertical;
-        if !coords.is_empty() {
-            if let Vertical::Synthesized {
+        if !coords.is_empty()
+            && let Vertical::Synthesized {
                 mvar,
                 advance,
                 origin,
             } = &mut vertical
-            {
-                if *mvar != 0 {
-                    if let Some(v) = var::Mvar::new(data, *mvar, coords) {
-                        use var::mvar_tags::*;
-                        let ascent_delta = v.delta(HASC);
-                        let descent_delta = v.delta(HDSC);
-                        *advance += ascent_delta + descent_delta;
-                        *origin += ascent_delta;
-                    }
-                }
-            }
+            && *mvar != 0
+            && let Some(v) = var::Mvar::new(data, *mvar, coords)
+        {
+            use var::mvar_tags::*;
+            let ascent_delta = v.delta(HASC);
+            let descent_delta = v.delta(HDSC);
+            *advance += ascent_delta + descent_delta;
+            *origin += ascent_delta;
         }
         GlyphMetrics {
             data,

@@ -1,5 +1,5 @@
 use super::{
-    super::{metrics::MetricsProxy, strike::BitmapStrikesProxy, FontRef},
+    super::{FontRef, metrics::MetricsProxy, strike::BitmapStrikesProxy},
     color::ColorProxy,
 };
 

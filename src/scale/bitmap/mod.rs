@@ -350,11 +350,7 @@ fn sample_dir<Input, Output, Filter>(
 
 fn sinc(t: f32) -> f32 {
     let a = t * core::f32::consts::PI;
-    if t == 0. {
-        1.
-    } else {
-        a.sin() / a
-    }
+    if t == 0. { 1. } else { a.sin() / a }
 }
 
 fn lanczos3(x: f32) -> f32 {
@@ -367,11 +363,7 @@ fn lanczos3(x: f32) -> f32 {
 
 fn bilinear(x: f32) -> f32 {
     let x = x.abs();
-    if x < 1. {
-        1. - x
-    } else {
-        0.
-    }
+    if x < 1. { 1. - x } else { 0. }
 }
 
 fn bicubic(x: f32) -> f32 {

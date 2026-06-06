@@ -3,7 +3,7 @@
 
 use super::super::{Category, Codepoint, Script};
 use super::unicode_data::{ClusterBreak, UseClass};
-use super::{CharCluster, Emoji, ShapeClass, Token, Whitespace, MAX_CLUSTER_SIZE};
+use super::{CharCluster, Emoji, MAX_CLUSTER_SIZE, ShapeClass, Token, Whitespace};
 
 type Kind = UseClass;
 
