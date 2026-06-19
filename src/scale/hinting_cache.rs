@@ -35,7 +35,7 @@ pub(super) struct HintingCache {
     // reconfigured for the same format.
     glyf_entries: Vec<HintingEntry>,
     cff_entries: Vec<HintingEntry>,
-    other_entries: Vec<HintingEntry>,
+    varc_entries: Vec<HintingEntry>,
     serial: u64,
 }
 
@@ -44,8 +44,7 @@ impl HintingCache {
         let entries = match key.outlines.format()? {
             OutlineGlyphFormat::Glyf => &mut self.glyf_entries,
             OutlineGlyphFormat::Cff | OutlineGlyphFormat::Cff2 => &mut self.cff_entries,
-            #[allow(unreachable_patterns)]
-            _ => &mut self.other_entries,
+            OutlineGlyphFormat::Varc => &mut self.varc_entries,
         };
         let (entry_ix, is_current) = find_hinting_entry(entries, key)?;
         let entry = entries.get_mut(entry_ix)?;
